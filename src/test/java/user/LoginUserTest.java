@@ -1,13 +1,15 @@
 package user;
 
-import generateRandom.GenerateRandomUser;
+import generate.random.GenerateRandomUser;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 public class LoginUserTest {
@@ -24,6 +26,7 @@ public class LoginUserTest {
     @Description("Успешная авторизация при вводе валидных данных")
     public void loginWithTrueInfo() {
         User user = GenerateRandomUser.getRandomUser();
+        Response registrationResponse = createUserExample.createUser(user);
         Response loginResponse = createUserExample.loginUser(user);
         id =loginResponse.as(UserId.class).getId();
 
@@ -47,7 +50,7 @@ public class LoginUserTest {
         loginResponse
                 .then()
                 .assertThat()
-                .statusCode(401)
+                .statusCode(SC_UNAUTHORIZED)
                 .body("success", equalTo(false));
     }
 
@@ -65,5 +68,17 @@ public class LoginUserTest {
                 .assertThat()
                 .statusCode(401)
                 .body("success", equalTo(false));
+    }
+
+    @After
+    public void tearDown() {
+        if (id != 0) {
+            Response deleteResponse = createUserExample.deleteUser(id);
+            deleteResponse
+                    .then()
+                    .assertThat()
+                    .statusCode(SC_OK)
+                    .body("success", equalTo(true));
+        }
     }
 }

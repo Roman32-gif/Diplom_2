@@ -1,4 +1,4 @@
-package generateRandom;
+package generate.random;
 
 import com.github.javafaker.Faker;
 import user.User;

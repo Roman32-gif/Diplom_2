@@ -43,6 +43,8 @@ public class CreateOrderExample extends Specification{
         return response;
     }
 
+
+    @Step("GET Ingredients")
     public Response getAllIngredients() {
         return given()
                 .spec(Specification.getSpecification())

@@ -2,6 +2,7 @@ package user;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
+import order.CreateOrderExample;
 import settings.Paths;
 import settings.Specification;
 
@@ -10,7 +11,7 @@ import static settings.Paths.USER_PATH;
 
 public class CreateUserExample extends Specification {
     @Step("POST")
-    public static Response createUser (User user) {
+    public static Response createUser(User user) {
         Response response = given()
                 .spec(Specification.getSpecification())
                 .body(user)
@@ -24,7 +25,7 @@ public class CreateUserExample extends Specification {
     }
 
     @Step("GET")
-    public static Response getUser (String accessToken) {
+    public static Response getUser(String accessToken) {
         Response response = given()
                 .spec(Specification.getSpecification())
                 .header("Authorization", accessToken)
@@ -38,7 +39,7 @@ public class CreateUserExample extends Specification {
     }
 
     @Step("POST")
-    public static Response loginUser (User user) {
+    public static Response loginUser(User user) {
         return given()
                 .spec(Specification.getSpecification())
                 .body(user)
@@ -48,7 +49,7 @@ public class CreateUserExample extends Specification {
     }
 
     @Step("POST")
-    public static Response logoutUser (String refreshToken) {
+    public static Response logoutUser(String refreshToken) {
         return given()
                 .spec(Specification.getSpecification())
                 .body(refreshToken)
@@ -57,7 +58,7 @@ public class CreateUserExample extends Specification {
     }
 
     @Step("DELETE")
-    public static Response deleteUser (int id) {
+    public static Response deleteUser(int id) {
         return given()
                 .header("Content-type", "application/json")
                 .when()
@@ -66,7 +67,7 @@ public class CreateUserExample extends Specification {
 
 
     @Step("PATCH")
-    public static Response updateUserWithAuthorization (User user, String accessToken) {
+    public static Response updateUserWithAuthorization(User user, String accessToken) {
         Response response = given()
                 .spec(Specification.getSpecification())
                 .body(user)
@@ -80,8 +81,8 @@ public class CreateUserExample extends Specification {
     }
 
     @Step("PATCH")
-    public  static Response updateUserWithoutAuthorization (User user) {
-        Response response =  given()
+    public static Response updateUserWithoutAuthorization(User user) {
+        Response response = given()
                 .spec(Specification.getSpecification())
                 .body(user)
                 .log().all()

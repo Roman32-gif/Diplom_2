@@ -1,6 +1,6 @@
 package user;
 
-import generateRandom.GenerateRandomUser;
+import generate.random.GenerateRandomUser;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;

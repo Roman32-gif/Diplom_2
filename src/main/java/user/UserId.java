@@ -1,9 +1,9 @@
 package user;
 
 public class UserId {
-    private int id;
+    private static int id;
 
-    public int getId() {
+    public static int getId() {
         return id;
     }
 }

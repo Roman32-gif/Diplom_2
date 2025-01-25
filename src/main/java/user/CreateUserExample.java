@@ -1,19 +1,18 @@
 package user;
-
 import io.qameta.allure.Step;
+import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import order.CreateOrderExample;
 import settings.Paths;
 import settings.Specification;
-
 import static io.restassured.RestAssured.given;
-import static settings.Paths.USER_PATH;
+import static settings.Paths.*;
 
 public class CreateUserExample extends Specification {
     @Step("POST")
     public static Response createUser(User user) {
         Response response = given()
                 .spec(Specification.getSpecification())
+                .header("Content-type", "application/json")
                 .body(user)
                 .log().all()
                 .post(USER_PATH + "register");
@@ -24,19 +23,6 @@ public class CreateUserExample extends Specification {
 
     }
 
-    @Step("GET")
-    public static Response getUser(String accessToken) {
-        Response response = given()
-                .spec(Specification.getSpecification())
-                .header("Authorization", accessToken)
-                .log().all()
-                .get(USER_PATH);
-
-        // Логирование ответа
-        response.then().log().all();
-
-        return response; // Возврат объекта Response
-    }
 
     @Step("POST")
     public static Response loginUser(User user) {
@@ -48,48 +34,67 @@ public class CreateUserExample extends Specification {
 
     }
 
-    @Step("POST")
-    public static Response logoutUser(String refreshToken) {
-        return given()
-                .spec(Specification.getSpecification())
-                .body(refreshToken)
-                .log().all()
-                .post(Paths.LOGOUT_PATH);
-    }
 
     @Step("DELETE")
     public static Response deleteUser(int id) {
         return given()
+                .spec(Specification.getSpecification())
                 .header("Content-type", "application/json")
                 .when()
-                .delete(USER_PATH + "/" + id);
+                .delete(USER_PATH + id);
     }
+
+    @Step("DELETE")
+    public Response deleteNewUser( String token) {
+        Response response = RestAssured.given()
+                .spec(Specification.getSpecification())
+                .header("Authorization", token)
+                .header("Content-type", "application/json")
+                .when()
+                .delete(USER_PATH + "user");
+
+        System.out.println("Delete response: " + response.asString()); // Логирование ответа
+        return response;
+    }
+
+
 
 
     @Step("PATCH")
     public static Response updateUserWithAuthorization(User user, String accessToken) {
-        Response response = given()
+        return given()
                 .spec(Specification.getSpecification())
-                .body(user)
-                .auth().oauth2(accessToken)
+                .header("Authorization", accessToken)
+                .header("Content-type", "application/json")
                 .log().all()
-                .patch(USER_PATH); // Используем userId в пути
+                .body(user)
+                .when()
+                .patch(UPDATE_PATH);
 
-        response.then().log().all();
+    }
 
-        return response; // Возврат объекта Response
+    @Step("POST")
+    public static Response resetPassword (User user, String accessToken) {
+        return given()
+                .spec(Specification.getSpecification())
+                .header("Authorization", accessToken)
+                .header("Content-type", "application/json")
+                .log().all()
+                .body(user)
+                .when()
+                .post(RESET_PATH);
+
     }
 
     @Step("PATCH")
     public static Response updateUserWithoutAuthorization(User user) {
-        Response response = given()
+        return given()
                 .spec(Specification.getSpecification())
-                .body(user)
+                .header("Content-type", "application/json")
                 .log().all()
-                .patch(USER_PATH);
+                .body(user)
+                .when()
+                .patch(USER_PATH + "user");
 
-        response.then().log().all();
-
-        return response; // Возврат объекта Response
     }
 }

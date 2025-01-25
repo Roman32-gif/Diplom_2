@@ -29,15 +29,14 @@ public class CreateUserTest {
     public void createUser() {
         User user = GenerateRandomUser.getRandomUser();
         Response response = createUserExample.createUser(user);
-        Response loginResponse = createUserExample.loginUser(user);
-        id =loginResponse.as(UserId.class).getId();
+        id =response.as(UserId.class).getId();
 
         response
                 .then()
                 .assertThat()
                 .statusCode(SC_OK)
                 .body("success", equalTo(true));
-
+        System.out.println(id);
 
     }
 
@@ -48,14 +47,14 @@ public class CreateUserTest {
         User user = GenerateRandomUser.getRandomUser();
         user.setEmail(null);
         Response response = createUserExample.createUser(user);
-        Response loginResponse = createUserExample.loginUser(user);
-        id =loginResponse.as(UserId.class).getId();
+        id =response.as(UserId.class).getId();
 
         response
                 .then()
                 .assertThat()
                 .statusCode(SC_FORBIDDEN)
-                .body("success", equalTo(false));
+                .body("success", equalTo(false))
+                .body("message", equalTo("Email, password and name are required fields"));
 
     }
 
@@ -66,14 +65,14 @@ public class CreateUserTest {
         User user = GenerateRandomUser.getRandomUser();
         user.setName(null);
         Response response = createUserExample.createUser(user);
-        Response loginResponse = createUserExample.loginUser(user);
-        id =loginResponse.as(UserId.class).getId();
+        id =response.as(UserId.class).getId();
 
         response
                 .then()
                 .assertThat()
                 .statusCode(SC_FORBIDDEN)
-                .body("success", equalTo(false));
+                .body("success", equalTo(false))
+                .body("message", equalTo("Email, password and name are required fields"));
 
     }
 
@@ -84,14 +83,14 @@ public class CreateUserTest {
         User user = GenerateRandomUser.getRandomUser();
         user.setPassword(null);
         Response response = createUserExample.createUser(user);
-        Response loginResponse = createUserExample.loginUser(user);
-        id =loginResponse.as(UserId.class).getId();
+        id =response.as(UserId.class).getId();
 
         response
                 .then()
                 .assertThat()
                 .statusCode(SC_FORBIDDEN)
-                .body("success", equalTo(false));
+                .body("success", equalTo(false))
+                .body("message", equalTo("Email, password and name are required fields"));
 
     }
 

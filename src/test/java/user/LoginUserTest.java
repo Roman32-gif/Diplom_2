@@ -51,7 +51,8 @@ public class LoginUserTest {
                 .then()
                 .assertThat()
                 .statusCode(SC_UNAUTHORIZED)
-                .body("success", equalTo(false));
+                .body("success", equalTo(false))
+                .body("message", equalTo( "email or password are incorrect" ));
     }
 
     @Test
@@ -67,7 +68,8 @@ public class LoginUserTest {
                 .then()
                 .assertThat()
                 .statusCode(401)
-                .body("success", equalTo(false));
+                .body("success", equalTo(false))
+                .body("message", equalTo( "email or password are incorrect" ));
     }
 
     @After

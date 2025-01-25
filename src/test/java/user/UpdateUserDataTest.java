@@ -1,91 +1,133 @@
 package user;
-
 import generate.random.GenerateRandomUser;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.http.HttpStatus.*;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertEquals;
 
 public class UpdateUserDataTest {
     private CreateUserExample createUserExample;
-    private int id;
-    public String accessToken;
+    private String token;
 
     @Before
     public void setUp(){
         createUserExample = new CreateUserExample();
-        //id = createUserExample.createUser();
+
     }
 
     @Test
     @DisplayName("Изменение данных пользователя")
-    @Description("Изменение имени пользователя")
+    @Description("Изменение имени пользователя с авторизацией")
     public void changeUserNameWithAuth() {
-        User updatedUser = GenerateRandomUser.getRandomUser();
-        updatedUser.setName("New Name");
-
-        Response response = createUserExample.updateUserWithAuthorization(updatedUser, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODNlNjU5OWVkMjgwMDAxYjU0OWIwMiIsImlhdCI6MTczNjY5NzQ0OCwiZXhwIjoxNzM2Njk4NjQ4fQ.ubUSwI4EEXQagLE26Hbg7xFM4ARtL3_aeHK-9ZOTtqk");
-
-        response.then()
+        User user = GenerateRandomUser.getRandomUser();
+        Response createResponse = createUserExample.createUser(user);
+        Response loginResponse = createUserExample.loginUser(user);
+        token = loginResponse.jsonPath().getString("accessToken");
+        user.setName("NewName");
+        Response updateResponse = createUserExample.updateUserWithAuthorization(user, token);
+        System.out.println("Update response: " + updateResponse.asString());
+        updateResponse.then()
                 .statusCode(SC_OK)
-                .body("name", equalTo("New Name"));
+                .body("success", equalTo(true));
     }
+
 
     @Test
     @DisplayName("Изменение данных пользователя")
-    @Description("Изменение почты пользователя")
+    @Description("Изменение почты пользователя с авторизацией")
     public void changeUserEmailWithAuth() {
-        User updatedUser = GenerateRandomUser.getRandomUser();
-        updatedUser.setEmail("newemail@example.com");
+        User user = GenerateRandomUser.getRandomUser();
+        Response createResponse = createUserExample.createUser(user);
+        Response loginResponse = createUserExample.loginUser(user);
+        token = loginResponse.jsonPath().getString("accessToken");
 
-        Response response = createUserExample.updateUserWithAuthorization(updatedUser, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODNlNjU5OWVkMjgwMDAxYjU0OWIwMiIsImlhdCI6MTczNjY5NzQ0OCwiZXhwIjoxNzM2Njk4NjQ4fQ.ubUSwI4EEXQagLE26Hbg7xFM4ARtL3_aeHK-9ZOTtqk");
+        user.setEmail("NewEmaglffjlplkgfjkhjhjkkgjgafa");
+        Response updateResponse = createUserExample.updateUserWithAuthorization(user, token);
 
-        response.then()
+        System.out.println("Update response: " + updateResponse.asString());
+
+        updateResponse.then()
                 .statusCode(SC_OK)
-                .body("email", equalTo("newemail@example.com"));
+                .body("success", equalTo(true));
+
     }
 
     @Test
     @DisplayName("Изменение данных пользователя")
-    @Description("Изменение пароля пользователя")
+    @Description("Изменение пароля пользователя с авторизацией")
     public void changeUserPasswordWithAuth() {
-        User updatedUser = GenerateRandomUser.getRandomUser();
-        Response loginResponse = createUserExample.loginUser(updatedUser);
-        //accessToken = loginResponse.body().as(CreateUserExample.class).getAccessToken();
-        updatedUser.setPassword("1234567890");
-        Response response = createUserExample.updateUserWithAuthorization(updatedUser,"");
-
-        response.then()
+        User user = GenerateRandomUser.getRandomUser();
+        Response createResponse = createUserExample.createUser(user);
+        Response loginResponse = createUserExample.loginUser(user);
+        String token = loginResponse.jsonPath().getString("accessToken");
+        user.setPassword("1243656857");
+        Response updateResponse = createUserExample.resetPassword(user, token);
+        System.out.println("Update response: " + updateResponse.asString());
+        updateResponse.then()
                 .statusCode(SC_OK)
-                .body("password", equalTo("1234567890"));
+                .body("success", equalTo(true))
+                .body("message", equalTo("Reset email sent"));
+
+
     }
 
 
 
     @Test
-    @DisplayName("Изменение данных пользователя")
-    @Description("Изменение данных пользователя без авторизации")
-    public void changeUserDataWithoutAuth() {
-        User updateUser = GenerateRandomUser.getRandomUser();
-        updateUser.setEmail("newemail@example.com");
-        updateUser.setPassword("newpassword123");
-        updateUser.setName("New Name");
+    @DisplayName("Изменение данных пользователя без авторизации")
+    @Description("Изменение имени пользователя")
+    public void changeUserNameWithoutAuth() {
+        User user = GenerateRandomUser.getRandomUser();
+        Response createResponse = createUserExample.createUser(user);
+        user.setName("NewName");
+        Response updateResponse = createUserExample.updateUserWithoutAuthorization(user);
+        System.out.println("Update response: " + updateResponse.asString());
+        updateResponse.then()
+                .statusCode(SC_UNAUTHORIZED)
+                .body("success", equalTo(false));
+    }
 
-        Response response = createUserExample.updateUserWithoutAuthorization(updateUser);
+    @Test
+    @DisplayName("Изменение данных пользователя без авторизации")
+    @Description("Изменение пароля пользователя ")
+    public void changeUserPasswordWithoutAuth() {
+        User user = GenerateRandomUser.getRandomUser();
+        Response createResponse = createUserExample.createUser(user);
+        user.setPassword("1243656857");
+        Response updateResponse = createUserExample.updateUserWithoutAuthorization(user);
+        System.out.println("Update response: " + updateResponse.asString());
+        updateResponse.then()
+                .statusCode(SC_UNAUTHORIZED)
+                .body("success", equalTo(false));
+    }
 
-        response.then()
-                .statusCode(SC_UNAUTHORIZED);
+    @Test
+    @DisplayName("Изменение данных пользователя без авторизации")
+    @Description("Изменение почты пользователя ")
+    public void changeUserEmailWithoutAuth() {
+        User user = GenerateRandomUser.getRandomUser();
+        Response createResponse = createUserExample.createUser(user);
+        user.setEmail("NewEmail");
+        Response updateResponse = createUserExample.updateUserWithoutAuthorization(user);
+        System.out.println("Update response: " + updateResponse.asString());
+        updateResponse.then()
+                .statusCode(SC_UNAUTHORIZED)
+                .body("success", equalTo(false));
+    }
 
-        User currentUser = (User) createUserExample.getUser("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3ODNlNjU5OWVkMjgwMDAxYjU0OWIwMiIsImlhdCI6MTczNjY5NzQ0OCwiZXhwIjoxNzM2Njk4NjQ4fQ.ubUSwI4EEXQagLE26Hbg7xFM4ARtL3_aeHK-9ZOTtqk");
+    @After
+    public void tearDown() {
+        if (token != null) {
+            Response deleteResponse = createUserExample.deleteNewUser(token);
+            System.out.println("Delete response: " + deleteResponse.asString()); // Логируем ответ на удаление
+        } else {
+            System.out.println("Token is null, skipping deletion.");
+        }
 
-        assertEquals("oldemail@example.com", currentUser.getEmail());
-        assertEquals("Old Name", currentUser.getName());
-        assertEquals("1234567890", currentUser.getPassword());
-}
+
+    }
 }

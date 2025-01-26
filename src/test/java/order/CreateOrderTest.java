@@ -3,6 +3,7 @@ import generate.random.GenerateRandomUser;
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
 import io.restassured.response.Response;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import user.CreateUserExample;
@@ -10,6 +11,8 @@ import user.User;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.apache.http.HttpStatus.SC_OK;
 import static org.hamcrest.CoreMatchers.equalTo;
 
 
@@ -17,6 +20,7 @@ public class CreateOrderTest {
 
     private CreateUserExample createUserExample;
     private CreateOrderExample createOrderExample;
+    private int id;
 
 
     @Before
@@ -157,6 +161,17 @@ public class CreateOrderTest {
 
     }
 
+    @After
+    public void tearDown() {
+        if (id != 0) {
+            Response deleteResponse = createUserExample.deleteUser(id);
+            deleteResponse
+                    .then()
+                    .assertThat()
+                    .statusCode(SC_OK)
+                    .body("success", equalTo(true));
+        }
+    }
 
 
 

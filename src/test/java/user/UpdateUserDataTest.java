@@ -27,12 +27,16 @@ public class UpdateUserDataTest {
         Response createResponse = createUserExample.createUser(user);
         Response loginResponse = createUserExample.loginUser(user);
         token = loginResponse.jsonPath().getString("accessToken");
-        user.setName("NewName");
+        user.setName("newname");
+        String name = user.getName();
         Response updateResponse = createUserExample.updateUserWithAuthorization(user, token);
+        String email = user.getEmail();
         System.out.println("Update response: " + updateResponse.asString());
         updateResponse.then()
                 .statusCode(SC_OK)
-                .body("success", equalTo(true));
+                .body("success", equalTo(true))
+                .body("user.email", equalTo(email))
+                .body("user.name", equalTo(name));
     }
 
 
@@ -45,14 +49,18 @@ public class UpdateUserDataTest {
         Response loginResponse = createUserExample.loginUser(user);
         token = loginResponse.jsonPath().getString("accessToken");
 
-        user.setEmail("NewEmaglffjlplkgfjkhjhjkkgjgafa");
+        String name = user.getName();
+        user.setEmail("newlife");
         Response updateResponse = createUserExample.updateUserWithAuthorization(user, token);
+        String email = user.getEmail();
 
         System.out.println("Update response: " + updateResponse.asString());
 
         updateResponse.then()
                 .statusCode(SC_OK)
-                .body("success", equalTo(true));
+                .body("success" , equalTo(true))
+                .body("user.email", equalTo(email))
+                .body("user.name", equalTo(name));
 
     }
 
